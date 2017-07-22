@@ -53,3 +53,10 @@ for song in songs_json:
     dec_url = des_cipher.decrypt(enc_url,padmode=PAD_PKCS5).decode('utf-8')
     dec_url = base_url + dec_url.replace('mp3:audios','') + '.mp3'
     print(dec_url,'\n')
+
+# this method will save the url with the mp3 to the current working directory
+# with the name provided.
+def download_song(url,filenameToSave):
+    import urllib
+    testfile = urllib.URLopener()
+    testfile.retrieve(url, filenameToSave)
