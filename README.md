@@ -2,13 +2,13 @@
 Python Script for the mp3 downloader from Saavn.com
 
 ## List of Pre-requirequisite Python Modules
-- BeautifulSoup
+- Tkinter
 ## To Install use Command
 
 ```
 
-pip install bs4
+pip install tkinter
       or
-pip3 install bs4
+pip3 install Tkinter
 
 ```
