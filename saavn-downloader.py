@@ -7,11 +7,12 @@ from json import JSONDecoder
 import base64
 import logging
 import requests
+import re
 from pyDes import *
 from bs4 import BeautifulSoup
-from telegram.ext import Updater
-from telegram.ext import CommandHandler
-from telegram.ext import MessageHandler, Filters
+from uuid import uuid4
+from telegram import InlineQueryResultArticle, ParseMode, InputTextMessageContent
+from telegram.ext import Updater, MessageHandler, Filters, InlineQueryHandler, CommandHandler
 
 # Key and IV are coded in plaintext in the app when decompiled
 # and its preety insecure to decrypt urls to the mp3 at the client side
@@ -23,6 +24,7 @@ proxy_ip = ''
 # set http_proxy from environment
 if('http_proxy' in os.environ):
     proxy_ip = os.environ['http_proxy']
+
 proxies = {
     'http': proxy_ip,
     'https': proxy_ip,
@@ -41,8 +43,9 @@ json_decoder = JSONDecoder()
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-def GetJSONInfo(input_url) :
-
+def SearchSongs(search_query) :
+    search_results = []
+    input_url = "https://www.saavn.com/search/" + search_query
     try:
         res = requests.get(input_url, proxies=proxies, headers=headers)
     except Exception as e:
@@ -50,16 +53,44 @@ def GetJSONInfo(input_url) :
         sys.exit()
 
     soup = BeautifulSoup(res.text, "lxml")
+    a = soup.find_all('li', {'class': 'song-wrap'})
+    for k in a:
+        b = {}
+        songs_json = k.find_all('div', {'class': 'hide song-json'})[0].contents[0]
+        obj = json_decoder.decode(songs_json)
+        title = obj['title']
+        album = obj['album']
+        perma_url = obj['perma_url']
+        image_url = obj['image_url']
+        language = obj['language']
+        starring = obj['starring']
+        singers = obj['singers']
+        music = obj['music']
+        year = obj['year']
+        tiny_url = obj['tiny_url']
+        twitter_url = obj['twitter_url']
+        album_url = obj['album_url']
+        label = obj['label']
+        b["title"] = title + " " + language + " " + year
+        b["description"] = album + " " + starring + " " + singers
+        b["url"] = perma_url
+        b["thumb_url"] = image_url
+        search_results.append(b)
+    return search_results
 
+def GetJSONInfo(input_url) :
+    try:
+        res = requests.get(input_url, proxies=proxies, headers=headers)
+    except Exception as e:
+        print('Error accesssing website error: ' + e)
+        sys.exit()
+    soup = BeautifulSoup(res.text, "lxml")
     # Encrypted url to the mp3 are stored in the webpage
     songs_json = soup.find_all('div', {'class': 'hide song-json'})
-
     return songs_json
 
 def GetSongURLsArray(songs_json) :
-
     url_array = {}
-
     for song in songs_json:
         # obj has the song info
         obj = json_decoder.decode(song.text)
@@ -100,8 +131,30 @@ def echo(bot, update):
                 title=title,
                 timeout=60
             )
+            # so many media files are being send
+            # we only need the first result
+            break
     else:
         bot.send_message(chat_id=update.message.chat_id, text="please send me a valid Saavn URL!")
+
+def inlinequery(bot, update):
+    """Handle the inline query."""
+    query = update.inline_query.query
+    search_results = SearchSongs(query)
+    results = []
+    for k in search_results:
+        results.append(
+            InlineQueryResultArticle(
+                id=uuid4(),
+                title=k["title"],
+                description=k["description"],
+                thumb_url=k["thumb_url"],
+                # thumb_width=,
+                # thumb_height=,
+                input_message_content=InputTextMessageContent(k["url"])
+            )
+        )
+    update.inline_query.answer(results)
 
 if __name__ == "__main__" :
     updater = Updater(token=TG_BOT_TOKEN)
@@ -110,4 +163,5 @@ if __name__ == "__main__" :
     dispatcher.add_handler(start_handler)
     echo_handler = MessageHandler(Filters.text, echo)
     dispatcher.add_handler(echo_handler)
+    dispatcher.add_handler(InlineQueryHandler(inlinequery))
     updater.start_polling()
