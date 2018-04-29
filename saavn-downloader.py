@@ -3,6 +3,7 @@
 # coded by Shyam Sunder Suthar
 
 import os
+import sys
 from json import JSONDecoder
 import base64
 import logging
@@ -13,6 +14,7 @@ from bs4 import BeautifulSoup
 from uuid import uuid4
 from telegram import InlineQueryResultArticle, ParseMode, InputTextMessageContent
 from telegram.ext import Updater, MessageHandler, Filters, InlineQueryHandler, CommandHandler
+from botan import Botan
 
 # Key and IV are coded in plaintext in the app when decompiled
 # and its preety insecure to decrypt urls to the mp3 at the client side
@@ -35,7 +37,9 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0'
 }
 
-TG_BOT_TOKEN = ""
+TG_BOT_TOKEN = sys.arv[1]
+botan_token = sys.argv[2]
+botan = Botan()
 
 base_url = 'http://h.saavncdn.com'
 
@@ -111,9 +115,11 @@ def download_song(url, filenameToSave):
 
 ## The telegram Specific Functions
 def start(bot, update):
+    botan.track(botan_token, update.message, update.message.chat_id)
     bot.send_message(chat_id=update.message.chat_id, text="Hi!, please send me a valid Saavn url I will upload to telegram as an audio.")
 
 def echo(bot, update):
+    botan.track(botan_token, update.message, update.message.chat_id)
     if(update.message.text.startswith("http")):
         url = update.message.text
         a = GetJSONInfo(url)
@@ -138,6 +144,7 @@ def echo(bot, update):
         bot.send_message(chat_id=update.message.chat_id, text="please send me a valid Saavn URL!")
 
 def inlinequery(bot, update):
+    botan.track(botan_token, update.inline_query.from_user.id, update.inline_query)
     """Handle the inline query."""
     query = update.inline_query.query
     search_results = SearchSongs(query)
@@ -165,3 +172,5 @@ if __name__ == "__main__" :
     dispatcher.add_handler(echo_handler)
     dispatcher.add_handler(InlineQueryHandler(inlinequery))
     updater.start_polling()
+    updater.idle()
+
