@@ -115,11 +115,11 @@ def download_song(url, filenameToSave):
 
 ## The telegram Specific Functions
 def start(bot, update):
-    botan.track(botan_token, update.message, update.message.chat_id)
+    # botan.track(botan_token, update.message, update.message.chat_id)
     bot.send_message(chat_id=update.message.chat_id, text="Hi!, please send me a valid Saavn url I will upload to telegram as an audio.")
 
 def echo(bot, update):
-    botan.track(botan_token, update.message, update.message.chat_id)
+    # botan.track(botan_token, update.message, update.message.chat_id)
     if(update.message.text.startswith("http")):
         url = update.message.text
         a = GetJSONInfo(url)
@@ -144,7 +144,7 @@ def echo(bot, update):
         bot.send_message(chat_id=update.message.chat_id, text="please send me a valid Saavn URL!")
 
 def inlinequery(bot, update):
-    botan.track(botan_token, update.inline_query.from_user.id, update.inline_query)
+    # botan.track(botan_token, update.inline_query.from_user.id, update.inline_query)
     """Handle the inline query."""
     query = update.inline_query.query
     search_results = SearchSongs(query)
@@ -173,4 +173,3 @@ if __name__ == "__main__" :
     dispatcher.add_handler(InlineQueryHandler(inlinequery))
     updater.start_polling()
     updater.idle()
-
