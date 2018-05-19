@@ -3,3 +3,4 @@ requests==2.12.1
 pyDes==2.0.1
 python-telegram-bot==9.0.0
 uuid==1.30
+lxml==4.2.1
