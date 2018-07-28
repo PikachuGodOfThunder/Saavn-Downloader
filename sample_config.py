@@ -1,3 +1,5 @@
+import os
+
 class Config(object):
     # get a token from https://chatbase.com
     CHAT_BASE_TOKEN = os.environ.get('CHAT_BASE_TOKEN', None)
