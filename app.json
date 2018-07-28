@@ -1,0 +1,36 @@
+{
+  "name": "Saavn Songs Downloader",
+  "description": "Telegram's best Song Downloader Bot. Send me a Saavn song link, and Get the audio as a Telegram file!",
+  "keywords": [
+    "telegram",
+    "best",
+    "song",
+    "downloader",
+    "saavn",
+    "piracy"
+  ],
+  "repository": "https://github.com/SpEcHiDe/Saavn-Downloader",
+  "env": {
+    "ENV": {
+      "description": "Setting this to ANYTHING will enable env variables. But, you need to understand the code to know what to set here!",
+      "value": "ANYTHING"
+    },
+    "TOKEN": {
+      "description": "Your bot token from @BotFather, as a string.",
+      "value": ""
+    },
+    "URL": {
+      "description": "The Heroku App URL similar to https://<appname>.herokuapp.com/",
+      "value": ""
+    },
+    "PORT": {
+      "description": "Port to use for your webhooks",
+      "value": "8443"
+    },
+    "CHAT_BASE_TOKEN": {
+      "description": "get a token from https://chatbase.com",
+      "value": ""
+    }
+  },
+  "addons": []
+}

@@ -14,7 +14,13 @@ from bs4 import BeautifulSoup
 from uuid import uuid4
 from telegram import InlineQueryResultArticle, ParseMode, InputTextMessageContent
 from telegram.ext import Updater, MessageHandler, Filters, InlineQueryHandler, CommandHandler
-from botan import Botan
+
+# the secret configuration specific things
+ENV = bool(os.environ.get('ENV', False))
+if ENV:
+    from sample_config import Config
+else:
+    from config import Config
 
 # Key and IV are coded in plaintext in the app when decompiled
 # and its preety insecure to decrypt urls to the mp3 at the client side
@@ -37,9 +43,21 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:49.0) Gecko/20100101 Firefox/49.0'
 }
 
-TG_BOT_TOKEN = sys.argv[1]
-botan_token = sys.argv[2]
-botan = Botan()
+TG_BOT_TOKEN = Config.TG_BOT_TOKEN
+botan_token = Config.CHAT_BASE_TOKEN
+
+# the Telegram trackings
+from chatbase import Message
+
+def TRChatBase(chat_id, message_text, intent):
+    msg = Message(api_key=botan_token,
+              platform="Telegram",
+              version="1.3",
+              user_id=chat_id,
+              message=message_text,
+              intent=intent)
+    resp = msg.send()
+
 
 base_url = 'http://h.saavncdn.com'
 
@@ -115,11 +133,11 @@ def download_song(url, filenameToSave):
 
 ## The telegram Specific Functions
 def start(bot, update):
-    # botan.track(botan_token, update.message, update.message.chat_id)
+    TRChatBase(update.message.chat_id, update.message.text, "/start")
     bot.send_message(chat_id=update.message.chat_id, text="Hi!, please send me a valid Saavn url I will upload to telegram as an audio.")
 
 def echo(bot, update):
-    # botan.track(botan_token, update.message, update.message.chat_id)
+    TRChatBase(update.message.chat_id, update.message.text, "echo")
     if(update.message.text.startswith("http")):
         url = update.message.text
         a = GetJSONInfo(url)
@@ -144,7 +162,7 @@ def echo(bot, update):
         bot.send_message(chat_id=update.message.chat_id, text="please send me a valid Saavn URL!")
 
 def inlinequery(bot, update):
-    # botan.track(botan_token, update.inline_query.from_user.id, update.inline_query)
+    TRChatBase(update.inline_query.from_user.id, update.inline_query.query, "inline")
     """Handle the inline query."""
     query = update.inline_query.query
     search_results = SearchSongs(query)
@@ -171,5 +189,9 @@ if __name__ == "__main__" :
     echo_handler = MessageHandler(Filters.text, echo)
     dispatcher.add_handler(echo_handler)
     dispatcher.add_handler(InlineQueryHandler(inlinequery))
-    updater.start_polling()
+    if ENV:
+        updater.start_webhook(listen="0.0.0.0", port=Config.PORT, url_path=TG_BOT_TOKEN)
+        updater.bot.set_webhook(url=Config.URL + TG_BOT_TOKEN)
+    else:
+        updater.start_polling()
     updater.idle()
