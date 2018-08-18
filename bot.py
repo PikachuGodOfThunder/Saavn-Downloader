@@ -163,7 +163,7 @@ def echo(bot, update):
             local_thumb_name = str(update.message.chat_id) + ".jpg"
             real_local_file_name = DownLoadFile(durl, local_file_name)
             real_local_thumb_image = DownLoadFile(image_url, local_thumb_name)
-            caption = "Performer: " + album + "\r\nTitle: " + title + "\r\nDownloaded by @SaavnDLBot"
+            caption = "Performer: " + album + "\r\nTitle: " + title + "\r\nDownloaded by @SaavnDLRoBot"
             bot.send_audio(
                 chat_id=update.message.chat_id,
                 audio=open(real_local_file_name, "rb"),
