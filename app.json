@@ -26,6 +26,10 @@
     "PORT": {
       "description": "Port to use for your webhooks",
       "value": "8443"
+    },
+    "CBTOKEN": {
+      "description": "Get a token from https://chatbase.com",
+      "value": ""
     }
   },
   "addons": []
