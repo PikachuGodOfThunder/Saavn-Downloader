@@ -12,10 +12,6 @@ Python Script for the MP3 downloader from Saavn.com
 
 [@SaavnDlBot](https://t.me/SaavnDlBot)
 
-### Deploy your Own @SaavnDLBot
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-
 ### LICENSE
 - GPLv3
 
