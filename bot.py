@@ -149,6 +149,13 @@ def start(bot, update):
         reply_to_message_id=update.message.message_id,
         text="Hi! 🤓 , please send me a valid Saavn url I will upload to telegram as an audio 😉. Use @SaavnDLRobot inline for searching songs. 🤒 "
     )
+def about(bot, update):
+    TRChatBase(update.message.chat_id, update.message.text, "about")
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        reply_to_message_id=update.message.message_id,
+        text="A Bot By @AbinPauIZackariah ❤️"
+    )
 
 def echo(bot, update):
     TRChatBase(update.message.chat_id, update.message.text, "echo")
